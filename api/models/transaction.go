@@ -12,6 +12,6 @@ var DatoTransaction = []Transaction{
 		OrdenID:    "123AB",
 		SessionID:  "345ab",
 		Monto:      1500,
-		UrlRetorno: "http://localhost:8083/commit",
+		UrlRetorno: "https://backend-webpay.tssw.cl/commit",
 	},
 }
