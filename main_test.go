@@ -8,7 +8,7 @@ import (
 )
 
 func TestVerifTransaction(t *testing.T) {
-	// Crea una solicitud HTTP de prueba con el método POST a la ruta "/verifica".
+	// Crea una solicitud HTTP de prueba con el método POST a la ruta "/verifica"
 	req, err := http.NewRequest("POST", "/commit", nil)
 	if err != nil {
 		t.Fatal(err)
