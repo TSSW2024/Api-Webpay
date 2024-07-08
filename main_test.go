@@ -20,7 +20,7 @@ func TestVerifTransaction(t *testing.T) {
 	// Llama a la función que deseas probar pasando la solicitud y el ResponseRecorder.
 	controller.VerifTransaction(rr, req)
 
-	// Verifica el código de estado de la respuesta. Si todo está bien, debería ser 200.
+	// Verifica el código de estado de la respuesta. Si todo está bien, debería ser 200
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("Código de estado incorrecto: esperado %v pero obtuvo %v", http.StatusOK, status)
 	}
