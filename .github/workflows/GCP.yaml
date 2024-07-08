@@ -13,6 +13,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Create .env file
+      run: |
+        echo "FIREBASE_API_KEY=${{ secrets.DB_HOST }}" >> .env
+        echo "SMTP_HOST=${{ secrets.DB_USER }}" >> .env
+        echo "SMTP_PORT=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "SMTP_USERNAME=${{ secrets.DB_PORT }}" >> .env
+        echo "SMTP_PASSWORD=${{ secrets.DB_NAME }}" >> .env
+      working-directory: ${{ github.workspace }}
 
 
     - name: Authenticate with gcloud CLI
