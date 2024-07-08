@@ -33,7 +33,7 @@ jobs:
           password: ${{ secrets.SERVICE_ACCOUNT_KEY }}
 
     - name: Build Docker Image
-      run: docker build -t ${{ secrets.REGISTRY_URL }}/${{ secrets.PROJECT_ID }}/images/${{ secrets.IMAGE_NAME }}:${{ github.sha }} .
+      run: docker buildx build --platform linux/amd64 -t ${{ secrets.REGISTRY_URL }}/${{ secrets.PROJECT_ID }}/images/${{ secrets.IMAGE_NAME }}:${{ github.sha }} .
 
   
     - name: Configure Docker Client
