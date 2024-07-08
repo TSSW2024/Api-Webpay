@@ -9,6 +9,6 @@ COPY *.go .
 RUN go build -o app
 
 # Exponer el puerto 8080
-EXPOSE 8080
+EXPOSE 8083
 
 ENTRYPOINT [ "./app" ]
