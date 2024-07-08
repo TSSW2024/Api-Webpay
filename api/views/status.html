@@ -8,12 +8,26 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f1f1f1;
+        }
+
+        .content {
+            text-align: center;
+            padding: 40px;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            /* Ajusta según tu preferencia */
         }
 
         table {
             border-collapse: collapse;
-            width: 50%;
+            width: 100%;
             margin-top: 20px;
         }
 
@@ -25,37 +39,113 @@
 
         th,
         td {
-            padding: 10px;
+            padding: 15px;
             text-align: left;
+        }
+
+        /* Estilo para centrar la imagen */
+        #image-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #transaction-image-authorized,
+        #transaction-image-failed,
+        #transaction-image-anulado {
+            max-width: 15%;
+            margin: 0 auto;
+            /* Centrar la imagen */
+        }
+
+        /* Estilo para centrar el botón */
+        button {
+            margin-top: 20px;
+            background-color: #FF5C00;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
-    <h1>Estado de Transacción</h1>
+    <div class="content">
+        <h1 id="transaction-title">Estado de Transacción</h1>
 
-    <table>
-        <tr>
-            <th>Número de Orden</th>
-            <td>{{.NumberOrder}}</td>
-        </tr>
-        <tr>
-            <th>ID de Sesión</th>
-            <td>{{.IdSession}}</td>
-        </tr>
-        <tr>
-            <th>Estado</th>
-            <td>{{.Status}}</td>
-        </tr>
-        <tr>
-            <th>Monto</th>
-            <td>{{.Amount}}</td>
-        </tr>
-        <!-- Agrega más filas según las propiedades de tu estructura LogEntry -->
-    </table>
+        <!-- Contenedor de la imagen para centrarla -->
+        <div id="image-container">
+            <img src="https://c0.klipartz.com/pngpicture/54/985/gratis-png-senal-correcta-verde-y-blanca-simbolo-de-angulo-de-hierba-amarillo-aceptar.png"
+                alt="Ticket o Imagen Autorizado" id="transaction-image-authorized">
+            <img src="https://w7.pngwing.com/pngs/683/171/png-transparent-christian-cross-symbol-computer-icons-american-red-cross-christian-cross-angle-christianity-cross-thumbnail.png"
+                alt="Ticket o Imagen Failed" id="transaction-image-failed" style="display: none;">
+            <img src="https://w7.pngwing.com/pngs/683/171/png-transparent-christian-cross-symbol-computer-icons-american-red-cross-christian-cross-angle-christianity-cross-thumbnail.png"
+                alt="Ticket o Imagen Anulado" id="transaction-image-anulado" style="display: none;">
+        </div>
 
-    <!-- Puedes agregar más elementos HTML según tus necesidades -->
+        <table>
+            <tr>
+                <th>Número de Orden</th>
+                <td>{{.NumberOrder}}</td>
+            </tr>
+            <tr>
+                <th>ID de Sesión</th>
+                <td>{{.IdSession}}</td>
+            </tr>
+            <tr>
+                <th>Estado</th>
+                <td id="transaction-status">{{.Status}}</td>
+            </tr>
+            <tr>
+                <th>Monto</th>
+                <td>{{.Amount}}</td>
+            </tr>
+            <!-- Agrega más filas según las propiedades de tu estructura LogEntry -->
+        </table>
 
+        <!-- Botón Ver Factura -->
+        <button id="verFacturaBtn" onclick="verFactura()">Ver Factura</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var transactionStatusElement = document.getElementById('transaction-status');
+            var transactionTitleElement = document.getElementById('transaction-title');
+            var authorizedImage = document.getElementById('transaction-image-authorized');
+            var failedImage = document.getElementById('transaction-image-failed');
+            var anuladoImage = document.getElementById('transaction-image-anulado');
+            var verFacturaBtn = document.getElementById('verFacturaBtn');
+
+            // Obtén el estado del pago desde tu modelo de datos
+            var estadoPago = '{{.Status}}';
+            console.log(estadoPago)
+
+            // Actualiza el contenido según el estado del pago
+            if (estadoPago === 'AUTHORIZED') {
+                transactionStatusElement.textContent = 'PAGO REALIZADO CON ÉXITO';
+                transactionTitleElement.textContent = '¡Pago Autorizado!';
+            } else if (estadoPago === 'Anulado') {
+                transactionStatusElement.textContent = 'PAGO ANULADO';
+                transactionTitleElement.textContent = '¡Pago Anulado!';
+                authorizedImage.style.display = 'none'; // Oculta la imagen específica del estado Autorizado
+                failedImage.style.display = 'block';
+                verFacturaBtn.style.display = 'none'; // Oculta el botón para ANULADO
+            } else if (estadoPago === 'FAILED') {
+                transactionStatusElement.textContent = 'PAGO CANCELADO';
+                transactionTitleElement.textContent = '¡Pago Cancelado!';
+                authorizedImage.style.display = 'none'; // Oculta la imagen específica del estado Autorizado
+                anuladoImage.style.display = 'block';
+                failedImage.style.display = 'none';
+                verFacturaBtn.style.display = 'none'; // Oculta el botón para FAILED
+            }
+        });
+
+        function verFactura() {
+            // Agrega aquí la lógica para redirigir o mostrar la factura según tus necesidades
+            alert('Mostrar factura o redirigir a la página de factura');
+        }
+    </script>
 </body>
 
 </html>

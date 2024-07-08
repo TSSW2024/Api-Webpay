@@ -6,10 +6,11 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"webpaygo/api/config"
 	"webpaygo/api/models"
-	"webpaygo/api/utils"
 
 	"github.com/fenriz07/Golang-Transbank-WebPay-Rest/pkg/transaction"
+	"gorm.io/gorm"
 )
 
 // Definición de la estructura TransactionLog
@@ -55,14 +56,25 @@ func VerifTransaction(w http.ResponseWriter, r *http.Request) {
 
 	// Crea un nuevo LogEntry
 	newLogEntry := models.LogEntry{
-		Status:            resp.Status,
-		Amount:            resp.Amount,
-		AccountingDate:    resp.AccountingDate,
-		PaymentTypeCode:   resp.PaymentTypeCode,
-		CardDetail:        resp.CardDetail,
+		NumberOrder: resp.BuyOrder,
+		IdSession:   resp.SessionID,
+		Status:      resp.Status,
+		Amount:      resp.Amount,
+		//BuyOrder:        resp.BuyOrder,
+		//SessionID:       resp.SessionID,
+		AccountingDate:  resp.AccountingDate,
+		TransactionDate: resp.TransactionDate,
+		PaymentTypeCode: resp.PaymentTypeCode,
+		CardDetail: models.CardDetail{
+			CardNumber: resp.CardDetail.CardNumber,
+		},
 		AuthorizationCode: resp.AuthorizationCode,
 	}
 
+	// Verificar si el campo Status está vacío y establecerlo como "Anulado" si es necesario
+	if newLogEntry.Status == "" {
+		newLogEntry.Status = "Anulado"
+	}
 	// Asignación condicional para NumberOrder
 	if numberOrder != "" {
 		newLogEntry.NumberOrder = numberOrder
@@ -89,7 +101,17 @@ func VerifTransaction(w http.ResponseWriter, r *http.Request) {
 		newLogEntry.Status = "Anulado"
 	}
 
-	logTransactionData(newLogEntry)
+	db := config.InitDatabase()
+
+	logTransactionData(db, newLogEntry)
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Println("Error obteniendo la interfaz de la base de datos:", err)
+	} else {
+		// Cerrar la conexión a la base de datos después de usarla
+		sqlDB.Close()
+	}
 
 	log.Println(resp)
 
@@ -122,39 +144,21 @@ func VerifTransaction(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func logTransactionData(logData models.LogEntry) {
+func logTransactionData(db *gorm.DB, newLogEntry models.LogEntry) {
 	// Almacenar el log en la base de datos
-	err := storeLogEntry(logData)
+	err := storeLogEntry(db, newLogEntry)
 	if err != nil {
 		log.Println("Error storing log in the database:", err)
 	}
 }
 
-func storeLogEntry(logData models.LogEntry) error {
-	db, err := utils.OpenDB()
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+func storeLogEntry(db *gorm.DB, newLogEntry models.LogEntry) error {
+	//log.Printf("Inserting log entry into database: %+v\n", newLogEntry)
 
-	//log.Printf("Inserting log entry into database: %+v\n", logData)
-
-	_, err = db.Exec(`
-        INSERT INTO log_entries (
-            status, amount, 
-            accounting_date, transaction_date, payment_type_code, 
-            card_number, authorization_code, number_order, id_session
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    `,
-		logData.Status, logData.Amount,
-		logData.AccountingDate, logData.TransactionDate,
-		logData.PaymentTypeCode, logData.CardDetail.CardNumber,
-		logData.AuthorizationCode, logData.NumberOrder, logData.IdSession,
-	)
+	err := db.Create(&newLogEntry).Error
 	if err != nil {
 		log.Println("Error database:", err)
 		return err
-
 	}
 
 	return nil
