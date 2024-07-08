@@ -17,7 +17,7 @@ func TestVerifTransaction(t *testing.T) {
 	// Crea un ResponseRecorder para registrar la respuesta.
 	rr := httptest.NewRecorder()
 
-	// Llama a la función que deseas probar pasando la solicitud y el ResponseRecorder.
+	// Llama a la función que deseas probar pasando la solicitud y el ResponseRecorder
 	controller.VerifTransaction(rr, req)
 
 	// Verifica el código de estado de la respuesta. Si todo está bien, debería ser 200
